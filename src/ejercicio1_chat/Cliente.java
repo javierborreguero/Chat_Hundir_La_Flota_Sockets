@@ -6,7 +6,6 @@ import java.io.*;
 
 class ClienteUDP {
 	private DatagramSocket socketUDP;
-
 	public ClienteUDP() {
 		try {
 			socketUDP = new DatagramSocket();
