@@ -16,7 +16,7 @@ class ClienteTCP {
 			entrada = new BufferedReader(new InputStreamReader(socketCliente.getInputStream()));
 			salida = new PrintWriter(new BufferedWriter(new OutputStreamWriter(socketCliente.getOutputStream())), true);
 		} catch (IOException e) {
-			System.err.printf("Imposible conectar con ip:%s / puerto:%d",ip,puerto);
+			System.err.printf("Imposible conectar con ip:%s / puerto:%d", ip, puerto);
 			System.exit(-1);
 		}
 	}
@@ -32,11 +32,11 @@ class ClienteTCP {
 		System.out.println("-> Cliente Terminado");
 	}
 
-	public void enviarMsg(String linea) {
+	public void sendMessage(String linea) {
 		salida.println(linea);
 	}
 
-	public String recibirMsg() {
+	public String receiveMessage() {
 		String msg = "";
 		try {
 			msg = entrada.readLine();
@@ -49,15 +49,47 @@ class ClienteTCP {
 
 public class Cliente {
 	public static void main(String[] args) throws IOException {
-		Scanner sc = new Scanner(System.in);
-		String linea;
-		ClienteTCP canal = new ClienteTCP("localhost", 5555);
-		System.out.println("Comience a escribir ('Adi�s') para terminar");
+		boolean fin = false;
+		ClienteTCP myClient = new ClienteTCP("localhost", 55555);
+		Board mBoard = new Board();
+		System.out.println("\n----- COMIENZA EL JUEGO -----\n");
+		String message = "";
+		mBoard.placeBoats();
+		mBoard.showBoard();
 		do {
-			linea = sc.nextLine();
-			canal.enviarMsg(linea);
-			System.out.println("Servidor: " + canal.recibirMsg());
-		} while (!linea.equals("Adi�s"));
-		canal.closeClienteTCP();
+			// Se usa expresión regular que comprueba que las letras coordenadas estén
+			// correctamente.
+			do {
+				Scanner sc = new Scanner(System.in);
+				System.out.print("¡AL ATAQUE!\nEscribe la coordenada, por ejemplo (B4): ");
+				message = sc.nextLine();
+			} while (!message.matches("^[A-J][0-9]*$"));
+			System.out.println("¡HAS REALIZADO EL ATAQUE!");
+			myClient.sendMessage(message);
+			message = myClient.receiveMessage();
+			System.out.println(message);
+			if (!message.contains("FIN")) {
+				message = myClient.receiveMessage();
+				System.out.println("¡EL ENEMIGO HA ATACADO EN LA POSICION " + message);
+
+				if (mBoard.atackBoard(message)) {
+					System.out.println("¡HAS PERDIDO!");
+					fin = true;
+					myClient.sendMessage("FIN");
+
+				}
+
+				else {
+
+					myClient.sendMessage("AGUA");
+
+				}
+			} else {
+				System.out.println("¡HAS GANADO!");
+				fin = true;
+			}
+
+		} while (!fin);
+
 	}
 }

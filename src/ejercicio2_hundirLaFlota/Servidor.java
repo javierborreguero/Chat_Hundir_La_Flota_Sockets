@@ -2,6 +2,7 @@ package ejercicio2_hundirLaFlota;
 
 import java.io.*;
 import java.net.*;
+import java.util.Scanner;
 
 class ServidorTCP {
 	private Socket socketCliente;
@@ -39,7 +40,7 @@ class ServidorTCP {
 		System.out.println("-> Servidor Terminado");
 	}
 
-	public String recibirMsg() {
+	public String receiveMessage() {
 		String linea = "";
 		try {
 			linea = entrada.readLine();
@@ -49,22 +50,49 @@ class ServidorTCP {
 		return linea;
 	}
 
-	public void enviarMsg(String linea) {
+	public void sendMessage(String linea) {
 		salida.println(linea);
 	}
 
 }
 
 public class Servidor {
-
 	public static void main(String[] args) throws IOException {
-		ServidorTCP canal = new ServidorTCP(5555);
-		String linea;
+		boolean fin = false;
+		Scanner sc = new Scanner(System.in);
+		ServidorTCP myServer = new ServidorTCP(55555);
+		Board mBoard = new Board();
+		System.out.println("\n---- COMIENA EL JUEGO -----\n");
+		mBoard.placeBoats();
+		mBoard.showBoard();
 		do {
-			linea = canal.recibirMsg();
-			System.out.println("Cliente: " + linea);
-			canal.enviarMsg("Eco - " + linea);
-		} while (!linea.equals("Adi�s"));
-		canal.closeServidorTCP();
+			String message = myServer.receiveMessage();
+			System.out.println("¡EL ENEMIGO HA ATACADO EN LA POSICION " + message);
+			if (mBoard.atackBoard(message)) {
+				System.out.println("¡HAS PERDIDO!");
+				fin = true;
+				myServer.sendMessage("FIN");
+			}
+
+			else {
+
+				myServer.sendMessage("AGUA");
+
+				do {
+					System.out.print("¡AL ATAQUE!\nEscribe la coordenada, por ejemplo -> (B4): ");
+					message = sc.nextLine();
+				} while (!message.matches("^[A-J][0-9]*$"));
+				System.out.println("¡HAS REALIZADO EL ATAQUE!");
+				myServer.sendMessage(message);
+				message = myServer.receiveMessage();
+				System.out.println(message);
+				if (message.contains("FIN")) {
+					System.out.println("¡HAS GANADO!");
+					fin = true;
+				}
+			}
+
+		} while (!fin);
+
 	}
 }
