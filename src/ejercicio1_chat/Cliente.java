@@ -6,6 +6,7 @@ import java.io.*;
 
 class ClienteUDP {
 	private DatagramSocket socketUDP;
+
 	public ClienteUDP() {
 		try {
 			socketUDP = new DatagramSocket();
@@ -49,7 +50,8 @@ public class Cliente {
 		Scanner sc = new Scanner(System.in);
 		String linea;
 		ClienteUDP canal = new ClienteUDP();
-		System.out.println("1) Empieza a escribir:\n2) Para terminar escribe -> Fin");
+		System.out.println(
+				"1 - INICIA EL RUN PRIMERO DESDE SERVIDOR Y LUEGO EL CLIENTE.\n2 - Empieza a escribir desde Cliente:\n3 - Para terminar escribe -> Fin");
 		do {
 			linea = sc.nextLine();
 			canal.enviarMsg(linea, "localhost", 5555);

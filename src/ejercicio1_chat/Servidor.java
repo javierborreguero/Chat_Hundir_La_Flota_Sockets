@@ -50,7 +50,8 @@ public class Servidor {
 	public static void main(String[] args) {
 		int puerto = 5555;
 		Scanner sc = new Scanner(System.in);
-		System.out.println("Servidor escucha por el puerto " + puerto);
+		System.out.println("Servidor escucha por el puerto " + puerto
+				+ "\n1 - INICIA EL RUN PRIMERO DESDE SERVIDOR Y LUEGO EL CLIENTE.\n2 - Empieza a escribir desde Cliente:\n3 - Para terminar escribe -> Fin");
 		ServidorUDP canal = new ServidorUDP(puerto);
 		String linea;
 		do {
